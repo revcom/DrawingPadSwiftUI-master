@@ -9,20 +9,17 @@
 import SwiftUI
 
 struct DrawingPad: View {
-    @Binding var currentDrawing: Drawing
-    @Binding var drawings: [Drawing]
-    @Binding var color: Color
-    @Binding var lineWidth: CGFloat
+    @ObservedObject var drawingVM: DrawingViewModel
     
     var body: some View {
         GeometryReader { geometry in
             Path { path in
-                for drawing in self.drawings {
-                    self.add(drawing: drawing, toPath: &path)
+                for shape in drawingVM.currentDrawing.shapes {
+                    self.add(shape: shape, toPath: &path)
                 }
-                self.add(drawing: self.currentDrawing, toPath: &path)
+                self.add(shape: drawingVM.currentShape, toPath: &path)
             }
-            .stroke(self.color, lineWidth: self.lineWidth)
+            .stroke(drawingVM.currentShape.colour, lineWidth: drawingVM.currentShape.width)
             .background(Color.black)
                 .gesture(
                     DragGesture(minimumDistance: 0.1)
@@ -30,20 +27,19 @@ struct DrawingPad: View {
                             let currentPoint = value.location
                             if currentPoint.y >= 0
                                 && currentPoint.y < geometry.size.height {
-                                self.currentDrawing.points.append(currentPoint)
+                                drawingVM.currentShape.points.append(currentPoint)
                             }
                         })
                         .onEnded({ (value) in
-                            self.drawings.append(self.currentDrawing)
-                            self.currentDrawing = Drawing()
+                            drawingVM.endOfShape()
                         })
             )
         }
         .frame(maxHeight: .infinity)
     }
     
-    private func add(drawing: Drawing, toPath path: inout Path) {
-        let points = drawing.points
+    private func add(shape: Shape, toPath path: inout Path) {
+        let points = shape.points
         if points.count > 1 {
             for i in 0..<points.count-1 {
                 let current = points[i]

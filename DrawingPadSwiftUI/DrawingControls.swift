@@ -9,11 +9,11 @@
 import SwiftUI
 
 struct DrawingControls: View {
-    @Binding var color: Color
-    @Binding var drawings: [Drawing]
-    @Binding var lineWidth: CGFloat
-    
+
+    @ObservedObject var drawingVM: DrawingViewModel
     @State private var colorPickerShown = false
+    
+    @State var colour: Color = Color.red
 
     private let spacing: CGFloat = 40
     
@@ -25,19 +25,20 @@ struct DrawingControls: View {
                         self.colorPickerShown = true
                     }
                     Button("Undo") {
-                        if self.drawings.count > 0 {
-                            self.drawings.removeLast()
+                        guard var firstDrawing = drawingVM.drawings.first else { return }
+                        if firstDrawing.shapes.count > 0 {
+                            firstDrawing.shapes.removeLast()
                         }
                     }
                     Button("Clear") {
-                        self.drawings = [Drawing]()
+                        drawingVM.drawings = [Drawing]()
                     }
                 }
                 HStack {
                     Text("Pencil width")
                         .padding()
-                    Slider(value: $lineWidth, in: 1.0...15.0, step: 1.0)
-                        .padding()
+//                    Slider(value: lineWidth, in: 1.0...15.0, step: 1.0)
+//                        .padding()
                 }
             }
 
@@ -46,7 +47,7 @@ struct DrawingControls: View {
         .sheet(isPresented: $colorPickerShown, onDismiss: {
             self.colorPickerShown = false
         }, content: { () -> ColorPicker in
-            ColorPicker(color: self.$color, colorPickerShown: self.$colorPickerShown)
+            ColorPicker(color: self.$colour, colorPickerShown: self.$colorPickerShown)
         })
     }
 }

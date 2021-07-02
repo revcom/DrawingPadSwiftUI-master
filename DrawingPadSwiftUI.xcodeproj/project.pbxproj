@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		9A58B890268F9F540012E37A /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A58B88F268F9F540012E37A /* Extensions.swift */; };
 		9A7A3FDB268E9C8B00886298 /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A7A3FDA268E9C8B00886298 /* CloudKit.framework */; };
 		9A7A3FDD268EA86300886298 /* DrawingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A7A3FDC268EA86300886298 /* DrawingViewModel.swift */; };
 		9A7A3FDF268EC5FE00886298 /* CloudBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A7A3FDE268EC5FE00886298 /* CloudBase.swift */; };
@@ -25,6 +26,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		9A58B88F268F9F540012E37A /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		9A7A3FD8268E9C8600886298 /* DrawingPadSwiftUI.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = DrawingPadSwiftUI.entitlements; sourceTree = "<group>"; };
 		9A7A3FDA268E9C8B00886298 /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
 		9A7A3FDC268EA86300886298 /* DrawingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrawingViewModel.swift; sourceTree = "<group>"; };
@@ -101,6 +103,7 @@
 				E8D874AC22E2856F002FE405 /* LaunchScreen.storyboard */,
 				E8D874AF22E2856F002FE405 /* Info.plist */,
 				E8D874A922E2856F002FE405 /* Preview Content */,
+				9A58B88F268F9F540012E37A /* Extensions.swift */,
 			);
 			path = DrawingPadSwiftUI;
 			sourceTree = "<group>";
@@ -191,6 +194,7 @@
 				E8D874C122E285EC002FE405 /* DrawingControls.swift in Sources */,
 				9A7A3FDF268EC5FE00886298 /* CloudBase.swift in Sources */,
 				E8D874A422E2856D002FE405 /* SceneDelegate.swift in Sources */,
+				9A58B890268F9F540012E37A /* Extensions.swift in Sources */,
 				E8D874BF22E285EC002FE405 /* DrawingPad.swift in Sources */,
 				9A7A3FDD268EA86300886298 /* DrawingViewModel.swift in Sources */,
 				E8D874C222E285EC002FE405 /* ColorEntry.swift in Sources */,
@@ -263,7 +267,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.5;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -318,7 +322,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.5;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
