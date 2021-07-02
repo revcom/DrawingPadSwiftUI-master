@@ -10,10 +10,11 @@ import CoreGraphics
 import SwiftUI
 
 struct Drawing {
-    var points: [CGPoint] = [CGPoint]()
+    var shapes: [Shape]
 }
 
 struct Shape {
+    var points: [CGPoint]
     var colour: Color
     var width: CGFloat
 }

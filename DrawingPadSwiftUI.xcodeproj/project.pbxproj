@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		9A7A3FDB268E9C8B00886298 /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A7A3FDA268E9C8B00886298 /* CloudKit.framework */; };
 		9A7A3FDD268EA86300886298 /* DrawingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A7A3FDC268EA86300886298 /* DrawingViewModel.swift */; };
+		9A7A3FDF268EC5FE00886298 /* CloudBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A7A3FDE268EC5FE00886298 /* CloudBase.swift */; };
 		E8D874A222E2856D002FE405 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8D874A122E2856D002FE405 /* AppDelegate.swift */; };
 		E8D874A422E2856D002FE405 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8D874A322E2856D002FE405 /* SceneDelegate.swift */; };
 		E8D874A622E2856D002FE405 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8D874A522E2856D002FE405 /* ContentView.swift */; };
@@ -27,6 +28,7 @@
 		9A7A3FD8268E9C8600886298 /* DrawingPadSwiftUI.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = DrawingPadSwiftUI.entitlements; sourceTree = "<group>"; };
 		9A7A3FDA268E9C8B00886298 /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
 		9A7A3FDC268EA86300886298 /* DrawingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrawingViewModel.swift; sourceTree = "<group>"; };
+		9A7A3FDE268EC5FE00886298 /* CloudBase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CloudBase.swift; sourceTree = "<group>"; };
 		E8D8749E22E2856D002FE405 /* DrawingPadSwiftUI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DrawingPadSwiftUI.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E8D874A122E2856D002FE405 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		E8D874A322E2856D002FE405 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -83,6 +85,7 @@
 		E8D874A022E2856D002FE405 /* DrawingPadSwiftUI */ = {
 			isa = PBXGroup;
 			children = (
+				9A7A3FDE268EC5FE00886298 /* CloudBase.swift */,
 				9A7A3FD8268E9C8600886298 /* DrawingPadSwiftUI.entitlements */,
 				E8D874A122E2856D002FE405 /* AppDelegate.swift */,
 				E8D874A322E2856D002FE405 /* SceneDelegate.swift */,
@@ -186,6 +189,7 @@
 				E8D874BE22E285EC002FE405 /* Drawing.swift in Sources */,
 				E8D874BD22E285EC002FE405 /* ColorsProvider.swift in Sources */,
 				E8D874C122E285EC002FE405 /* DrawingControls.swift in Sources */,
+				9A7A3FDF268EC5FE00886298 /* CloudBase.swift in Sources */,
 				E8D874A422E2856D002FE405 /* SceneDelegate.swift in Sources */,
 				E8D874BF22E285EC002FE405 /* DrawingPad.swift in Sources */,
 				9A7A3FDD268EA86300886298 /* DrawingViewModel.swift in Sources */,
