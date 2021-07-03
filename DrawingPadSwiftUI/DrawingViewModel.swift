@@ -17,7 +17,7 @@ class DrawingViewModel : ObservableObject {
     @Published var currentShape: Shape = Shape(colour: Color.yellow, width: 2)
     @Published var drawings: [Drawing] = []
     @Published var color: Color = Color.yellow
-    @Published var lineWidth: CGFloat = 3.0
+    @Published var lineWidth: Double = 3.0
 
     func endOfShape() {
         currentDrawing.shapes.append(currentShape)

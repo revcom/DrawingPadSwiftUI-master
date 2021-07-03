@@ -25,9 +25,8 @@ struct DrawingControls: View {
                         self.colorPickerShown = true
                     }
                     Button("Undo") {
-                        guard var firstDrawing = drawingVM.drawings.first else { return }
-                        if firstDrawing.shapes.count > 0 {
-                            firstDrawing.shapes.removeLast()
+                        if drawingVM.currentDrawing.shapes.count > 0 {
+                            drawingVM.currentDrawing.shapes.removeLast()
                         }
                     }
                     Button("Clear") {
@@ -37,8 +36,8 @@ struct DrawingControls: View {
                 HStack {
                     Text("Pencil width")
                         .padding()
-//                    Slider(value: lineWidth, in: 1.0...15.0, step: 1.0)
-//                        .padding()
+                    Slider(value: $drawingVM.currentShape.width, in: 1.0...15.0, step: 1.0)
+                        .padding()
                 }
             }
 
@@ -47,7 +46,7 @@ struct DrawingControls: View {
         .sheet(isPresented: $colorPickerShown, onDismiss: {
             self.colorPickerShown = false
         }, content: { () -> ColorPicker in
-            ColorPicker(color: self.$colour, colorPickerShown: self.$colorPickerShown)
+            ColorPicker(color: $drawingVM.currentShape.colour, colorPickerShown: self.$colorPickerShown)
         })
     }
 }

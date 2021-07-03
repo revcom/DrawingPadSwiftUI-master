@@ -19,7 +19,7 @@ struct DrawingPad: View {
                 }
                 self.add(shape: drawingVM.currentShape, toPath: &path)
             }
-            .stroke(drawingVM.currentShape.colour, lineWidth: drawingVM.currentShape.width)
+            .stroke(drawingVM.currentShape.colour, lineWidth: CGFloat(drawingVM.currentShape.width))
             .background(Color.black)
                 .gesture(
                     DragGesture(minimumDistance: 0.1)

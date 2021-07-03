@@ -16,9 +16,9 @@ struct Drawing {
 struct Shape {
     var points: [CGPoint]
     var colour: Color
-    var width: CGFloat
+    var width: Double
     
-    init(colour: Color, width: CGFloat) {
+    init(colour: Color, width: Double) {
         self.points = []
         self.colour = colour
         self.width = width
