@@ -12,8 +12,8 @@ class CloudBase {
     
     enum Status { case timeoutError, otherError, completed }
     
-    let iCloudDatabase = CKContainer(identifier: "iCloud.com.revcomputing.WhereWhenHowMuch").privateCloudDatabase
-    static let ourZone = "WhereWhenHowMuch"
+    let iCloudDatabase = CKContainer(identifier: "iCloud.com.revcomputing.SharedDrawing").privateCloudDatabase
+//    static let ourZone = "WhereWhenHowMuch"
     
     //MARK: - Find records
     func findAllRecords<T>(onFound: @escaping ([T]) -> Void, iCloudRecordType: String = String(describing: T.self), onError: @escaping (Error) -> Void) {
@@ -24,7 +24,7 @@ class CloudBase {
         let query = CKQuery(recordType: iCloudRecordType, predicate: NSPredicate(value: true))
 
         let operation = CKQueryOperation(query: query)
-        operation.zoneID = CKRecord.ID(zoneID: CKRecordZone(zoneName: CloudBase.ourZone).zoneID).zoneID
+        operation.zoneID = .default
         operation.resultsLimit = 200
 
         operation.recordFetchedBlock = { [self] record in

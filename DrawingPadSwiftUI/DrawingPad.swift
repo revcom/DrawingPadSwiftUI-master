@@ -31,7 +31,7 @@ struct DrawingPad: View {
                             }
                         })
                         .onEnded({ (value) in
-                            drawingVM.endOfShape()
+                            drawingVM.endOfShape() { _ in print ("Ready for next stroke") }
                         })
             )
         }

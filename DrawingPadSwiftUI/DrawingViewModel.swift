@@ -19,8 +19,9 @@ class DrawingViewModel : ObservableObject {
     @Published var color: Color = Color.yellow
     @Published var lineWidth: Double = 3.0
 
-    func endOfShape() {
+    func endOfShape(onSaved: @escaping (CKRecord.ID) -> Void) {
         currentDrawing.shapes.append(currentShape)
+        saveShape(shape: currentShape) { id in onSaved(id) }
         currentShape = Shape(colour: color, width: lineWidth)
     }
     
@@ -30,26 +31,37 @@ class DrawingViewModel : ObservableObject {
         return nil
     }
     
-    func saveDrawing(drawing: Drawing) {
+    func saveShape(shape: Shape, onSaved: @escaping (CKRecord.ID) -> Void ) {
+        
+        let newRecord = CKRecord(recordType: "Shape", recordID: CKRecord.ID(zoneID: .default))
+        cloud.shapeToRecord(shape: shape, record: newRecord/*, reference: <#CKRecord.Reference#>*/)
+
+        cloud.saveRecord(from: shape, record: newRecord, onSaved: { (savedRecordID) in
+            self.currentShape.originalRecord = newRecord    //So it can be updated later if necessary
+            onSaved(savedRecordID)
+        })
+
+//        let record = cloud.shapeToRecord(shape: currentShape, record: CKRecord(), reference: )
 //        cloud.saveRecord(from: Drawing.self, record: <#T##CKRecord#>, onSaved: <#T##(CKRecord.ID) -> Void#>)
     }
 }
 
 class CloudDrawing: CloudBase {
     
-    private func drawingToRecord(drawing: Drawing, record: CKRecord, reference: CKRecord.Reference) {
+//    private func drawingToRecord(drawing: Drawing, record: CKRecord, reference: CKRecord.Reference) {
 //        shapeToRecord(shape: drawing.shapes.first!, record: <#T##CKRecord#>, reference: <#T##CKRecord.Reference#>)
-    }
+//    }
     
-    func shapeToRecord(shape: Shape, record: CKRecord, reference: CKRecord.Reference) {
-        record.setObject(reference, forKey: "Drawing")
+    func shapeToRecord(shape: Shape, record: CKRecord /*, reference: CKRecord.Reference*/) {
+//        record.setObject(reference, forKey: "Drawing")
         
-        var points: [CGFloat] = []
+        var points: [Double] = []
         for point in shape.points {
-            points.append(point.x)
-            points.append(point.y)
+            points.append(Double(point.x))
+            points.append(Double(point.y))
         }
-        record.setObject(points.map( Double.init ) as __CKRecordObjCValue, forKey: "Points")
+        print ("Saving shape (\(shape.points.count) points)")
+        record.setObject(points as __CKRecordObjCValue, forKey: "Points")
         record.setObject(shape.width as __CKRecordObjCValue, forKey: "Width")
 
         guard let colour = UIColor(shape.colour).rgb() else { return }
