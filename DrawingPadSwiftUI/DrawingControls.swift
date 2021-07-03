@@ -26,7 +26,7 @@ struct DrawingControls: View {
                     }
                     Button("Undo") {
                         if drawingVM.currentDrawing.shapes.count > 0 {
-                            drawingVM.currentDrawing.shapes.removeLast()
+                            drawingVM.removeLastShape()
                         }
                     }
                     Button("Clear") {

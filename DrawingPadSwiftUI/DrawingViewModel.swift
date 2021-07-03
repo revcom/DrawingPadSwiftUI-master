@@ -13,7 +13,7 @@ import CloudKit
 
 class DrawingViewModel : ObservableObject {
     
-    @Published var currentDrawing: Drawing = Drawing(name: "Default")
+    @Published var currentDrawing: Drawing = Drawing(name: "--Default--")
     @Published var currentShape: Shape = Shape(colour: Color.yellow, width: 2)
     @Published var drawings: [Drawing] = []
     @Published var color: Color = Color.yellow
@@ -22,19 +22,25 @@ class DrawingViewModel : ObservableObject {
     init() {
         startNewDrawing()
     }
+    
+    func removeLastShape() {
+        currentDrawing.shapes.removeLast()
+    }
 
     func startNewDrawing() {
         drawings = []
-        currentDrawing = Drawing(name: "Main")
-        drawings.append(currentDrawing)
+        drawings.append(Drawing(name: "Main"))
+        guard let firstDrawing = drawings.first else { return }
+        currentDrawing = firstDrawing
     }
     
     func endOfShape(onSaved: @escaping (CKRecord.ID) -> Void) {
-        currentDrawing.shapes.append(currentShape)
-        print ("Appended shape with \(currentShape.points.count) points")
+        guard var firstDrawing = drawings.first else { print ("🔴 No initial drawing"); return }
+        drawings[0].shapes.append(currentShape)
+        print ("Appended shape with \(currentShape.points.count) points. Drawing \(drawings[0].name) has \(drawings[0].shapes.count) shapes")
 //        saveShape(drawing: currentDrawing, shape: currentShape) { id in onSaved(id) }
         currentShape = Shape(colour: color, width: lineWidth)
-        for (index, shape) in drawings.first!.shapes.enumerated() {
+        for (index, shape) in drawings[0].shapes.enumerated() {
             print ("Shape \(index) points \(shape.points.count)")
         }
     }
