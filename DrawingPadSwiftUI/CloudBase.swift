@@ -72,7 +72,7 @@ class CloudBase {
     
     func saveRecord<T>(from: T, record: CKRecord, onSaved: @escaping (CKRecord.ID) -> Void ) {
         let iCloudRecordType = String(describing: T.self)
-        print ("Saving 1 \(iCloudRecordType) record type iCloudRecordType")
+        print ("Saving 1 \(iCloudRecordType) record type \(iCloudRecordType)")
         
         saveRecord(record: record, onSaved: onSaved)
     }

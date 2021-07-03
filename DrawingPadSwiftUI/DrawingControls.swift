@@ -30,6 +30,7 @@ struct DrawingControls: View {
                         }
                     }
                     Button("Clear") {
+                        drawingVM.saveDrawing()
                         drawingVM.drawings = [Drawing]()
                     }
                 }

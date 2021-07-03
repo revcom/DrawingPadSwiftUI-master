@@ -11,6 +11,9 @@ import SwiftUI
 import CloudKit
 
 struct Drawing {
+    var originalRecord: CKRecord? = nil
+    var reference: CKRecord.Reference? = nil
+    var name: String
     var shapes: [Shape] = []
 }
 
