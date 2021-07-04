@@ -12,16 +12,19 @@ let drawingVM = DrawingViewModel()
 
 struct ContentView: View {
     
+    @State var drawingsLoaded = false
+
     var body: some View {
         VStack(alignment: .center) {
-            if drawingVM.drawings.count > 0 {
-                Text(drawingVM.currentDrawing.name).font(.largeTitle)
+            if drawingsLoaded {
+                Text(drawingVM.currentDrawing.name + " Drawing").font(.largeTitle)
             } else {
                 Text("Loading drawings...").font(.largeTitle)
             }
             DrawingPad(drawingVM: drawingVM)
                 .onAppear(perform: { drawingVM.loadDrawing {
                     print ("Drawing loaded...")
+                    drawingsLoaded = true
                 } })
             DrawingControls(drawingVM: drawingVM)
         }
