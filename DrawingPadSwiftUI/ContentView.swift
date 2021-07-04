@@ -14,17 +14,22 @@ struct ContentView: View {
     
     var body: some View {
         VStack(alignment: .center) {
-            Text("Draw here...").font(.largeTitle)
-
+            if drawingVM.drawings.count > 0 {
+                Text(drawingVM.currentDrawing.name).font(.largeTitle)
+            } else {
+                Text("Loading drawings...").font(.largeTitle)
+            }
             DrawingPad(drawingVM: drawingVM)
-//                .onAppear(perform: { drawingVM.loadDrawing() })
+                .onAppear(perform: { drawingVM.loadDrawing {
+                    print ("Drawing loaded...")
+                } })
             DrawingControls(drawingVM: drawingVM)
         }
         .onAppear() {
-            if drawingVM.drawings.count == 0 {
-                drawingVM.currentDrawing.shapes.append(drawingVM.currentShape)
-                drawingVM.drawings.append(drawingVM.currentDrawing)
-            }
+//            if drawingVM.drawings.count == 0 {
+//                drawingVM.currentDrawing.shapes.append(drawingVM.currentShape)
+//                drawingVM.drawings.append(drawingVM.currentDrawing)
+//            }
         }
     }
 }

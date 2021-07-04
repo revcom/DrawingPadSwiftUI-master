@@ -10,11 +10,15 @@ import CoreGraphics
 import SwiftUI
 import CloudKit
 
-struct Drawing {
+class Drawing {
     var originalRecord: CKRecord? = nil
     var reference: CKRecord.Reference? = nil
-    var name: String
+    var name: String = ""
     var shapes: [Shape] = []
+    
+    init (name: String) {
+        self.name = name
+    }
 }
 
 struct Shape {

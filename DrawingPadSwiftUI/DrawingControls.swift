@@ -31,7 +31,7 @@ struct DrawingControls: View {
                     }
                     Button("Clear") {
                         drawingVM.saveDrawing()
-                        drawingVM.drawings = [Drawing]()
+//                        drawingVM.drawings = [Drawing]()
                     }
                 }
                 HStack {

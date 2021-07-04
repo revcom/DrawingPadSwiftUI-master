@@ -13,55 +13,67 @@ import CloudKit
 
 class DrawingViewModel : ObservableObject {
     
-    @Published var currentDrawing: Drawing = Drawing(name: "--Default--")
+//    @Published var currentDrawing: Drawing = Drawing(name: "--Default--")
     @Published var currentShape: Shape = Shape(colour: Color.yellow, width: 2)
     @Published var drawings: [Drawing] = []
     @Published var color: Color = Color.yellow
     @Published var lineWidth: Double = 3.0
     
+    var currentDrawingIndex = 0
+    var currentDrawing: Drawing {
+        get { return drawings[currentDrawingIndex] }
+    }
+    
     init() {
-        startNewDrawing()
+//        startNewDrawing()
     }
     
     func removeLastShape() {
-        currentDrawing.shapes.removeLast()
+        let drawing = currentDrawing
+        drawing.shapes.removeLast()
     }
 
     func startNewDrawing() {
-        drawings = []
         drawings.append(Drawing(name: "Main"))
-        guard let firstDrawing = drawings.first else { return }
-        currentDrawing = firstDrawing
+        currentDrawingIndex += 1
     }
     
     func endOfShape(onSaved: @escaping (CKRecord.ID) -> Void) {
-        var firstDrawing = drawings[0]
-        drawings[0].shapes.append(currentShape)
-        print ("Appended shape with \(currentShape.points.count) points. Drawing \(drawings[0].name) has \(drawings[0].shapes.count) shapes")
+        currentDrawing.shapes.append(currentShape)
+        print ("Appended shape with \(currentShape.points.count) points. Drawing \(currentDrawing.name) has \(currentDrawing.shapes.count) shapes")
 //        saveShape(drawing: currentDrawing, shape: currentShape) { id in onSaved(id) }
         currentShape = Shape(colour: color, width: lineWidth)
-        for (index, shape) in drawings[0].shapes.enumerated() {
+        for (index, shape) in currentDrawing.shapes.enumerated() {
             print ("Shape \(index) points \(shape.points.count)")
         }
     }
     
     let cloud = CloudDrawing()
 
-    func loadDrawing() -> Drawing? {
-        return nil
+    func loadDrawing(onFound: @escaping () -> Void) {
+        drawings.append(Drawing(name: "Main"))
+        
+        cloud.findAllDrawings(onFound: { drawings in
+            DispatchQueue.main.async {
+                self.drawings.append(contentsOf: drawings)
+                self.currentDrawingIndex = 0
+                onFound()
+            }
+        } , onError: { error in
+            print ("🔴 Error \(error.localizedDescription) loading drawings")
+        } )
     }
     
     func saveDrawing() {
         let drawingRecord = CKRecord(recordType: "Drawing", recordID: CKRecord.ID(zoneID: .default))
         
-        guard var drawing = drawings.first else { print ("🔴 No drawings yet"); return }
-        drawing.reference = CKRecord.Reference(record: drawingRecord, action: .deleteSelf)
+        currentDrawing.reference = CKRecord.Reference(record: drawingRecord, action: .deleteSelf)
 
-        cloud.drawingToRecord(drawing: drawing, record: drawingRecord)
-        cloud.saveRecord(from: drawing, record: drawingRecord, onSaved: { savedRecordID in
-            drawing.originalRecord = drawingRecord
-            self.saveShapesForDrawing(recordID: drawingRecord.recordID, shapes: drawing.shapes, onShapesSaved: {
-                print ("Saved \(drawing.shapes.count) shapes")
+        cloud.drawingToRecord(drawing: currentDrawing, record: drawingRecord)
+        cloud.saveRecord(from: currentDrawing, record: drawingRecord, onSaved: { savedRecordID in
+            self.currentDrawing.originalRecord = drawingRecord
+            self.saveShapesForDrawing(recordID: drawingRecord.recordID, shapes: self.currentDrawing.shapes, onShapesSaved: {
+                print ("Saved \(self.currentDrawing.shapes.count) shapes")
             })
         })
     }
@@ -97,6 +109,10 @@ class DrawingViewModel : ObservableObject {
 
 class CloudDrawing: CloudBase {
     
+    func findAllDrawings(onFound: @escaping (([Drawing]) -> Void ), onError: @escaping (Error) -> Void ) {
+        findAllRecords(onFound: onFound, onError: onError)
+    }
+    
     func drawingToRecord(drawing: Drawing, record: CKRecord) {
         record.setObject(drawing.name as __CKRecordObjCValue, forKey: "Name")
     }
@@ -104,17 +120,27 @@ class CloudDrawing: CloudBase {
     func shapeToRecord(shape: Shape, record: CKRecord , reference: CKRecord.Reference) {
         record["Drawing"] = reference
         
-        var points: [Double] = []
+        var XPoints: [Double] = []
+        var YPoints: [Double] = []
         for point in shape.points {
-            points.append(Double(point.x))
-            points.append(Double(point.y))
+            XPoints.append(Double(point.x))
+            YPoints.append(Double(point.y))
         }
-        record.setObject(points as __CKRecordObjCValue, forKey: "Points")
+        record.setObject(XPoints as __CKRecordObjCValue, forKey: "XPoints")
+        record.setObject(YPoints as __CKRecordObjCValue, forKey: "YPoints")
         record.setObject(shape.width as __CKRecordObjCValue, forKey: "Width")
 
         guard let colour = UIColor(shape.colour).rgb() else { return }
         record.setObject(colour as __CKRecordObjCValue, forKey: "Colour")
     }
     
+    override func recordToResult(record: CKRecord) -> Any? {
+        let drawingName = record["Name"] as! String
+        let newDrawing = Drawing(name: drawingName)
+        newDrawing.originalRecord = record
+
+        print ("Found drawing named: \(newDrawing.name)")
+        return newDrawing
+    }
     
 }
