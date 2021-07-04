@@ -27,9 +27,9 @@ struct Shape {
     var colour: Color
     var width: Double
     
-    init(colour: Color, width: Double) {
+    init(colour: Color, width: Double, points: [CGPoint] = []) {
         originalRecord = nil
-        self.points = []
+        self.points = points
         self.colour = colour
         self.width = width
     }

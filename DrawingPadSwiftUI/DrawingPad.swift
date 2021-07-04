@@ -16,6 +16,7 @@ struct DrawingPad: View {
             if drawingVM.drawings.count > 0 {
                 Path { path in
                     for shape in drawingVM.currentDrawing.shapes {
+//                        print ("Color: \(shape.colour) Width: \(shape.width) Points: \(shape.points.count)")
                         self.add(shape: shape, toPath: &path)
                     }
                     self.add(shape: drawingVM.currentShape, toPath: &path)
