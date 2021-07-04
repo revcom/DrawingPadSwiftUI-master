@@ -35,7 +35,7 @@ class DrawingViewModel : ObservableObject {
     }
     
     func endOfShape(onSaved: @escaping (CKRecord.ID) -> Void) {
-        guard var firstDrawing = drawings.first else { print ("🔴 No initial drawing"); return }
+        var firstDrawing = drawings[0]
         drawings[0].shapes.append(currentShape)
         print ("Appended shape with \(currentShape.points.count) points. Drawing \(drawings[0].name) has \(drawings[0].shapes.count) shapes")
 //        saveShape(drawing: currentDrawing, shape: currentShape) { id in onSaved(id) }
