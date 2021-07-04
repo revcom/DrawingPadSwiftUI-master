@@ -60,6 +60,39 @@ class CloudBase {
         iCloudDatabase.add(operation)
     }
     
+    //This returns all records of type 'ReferencingType' that contain a reference to a specific record of type 'ReferredToType' e.g. Return all Booking records with a reference to a specific Guest record
+    func fetchRecordsByReference<ReferencingType, ReferredToType>(reference: CKRecord.Reference, referenceTo: ReferredToType, onFetched: @escaping ([ReferencingType]) -> Void) {
+        var results: [ReferencingType] = []
+
+        let iCloudRecordType = String(describing: ReferencingType.self)       //Or "\(ReferencingType.self)"
+        let hostRecordType = String(describing: ReferredToType.self)
+        print ("🟢 Finding any '\(iCloudRecordType)' record(s) with reference to \(hostRecordType)")
+
+        let pred = NSPredicate(format: "\(hostRecordType) = %@", reference)
+        let query = CKQuery(recordType: iCloudRecordType, predicate: pred)
+
+        let operation = CKQueryOperation(query: query)
+        operation.zoneID = .default
+
+        operation.recordFetchedBlock = { [self] record in
+            DispatchQueue.main.sync {
+                print ("Found record of type: '\(hostRecordType)'")
+                results.append(recordToResult(record: record) as! ReferencingType)
+            }
+        }
+
+        operation.queryCompletionBlock = { (cursor, error) in
+            DispatchQueue.main.sync {
+                if error == nil {
+                    onFetched(results)
+                } else {
+                    self.handleCloudKitErrors(error: error)
+                }
+            }
+        }
+        iCloudDatabase.add(operation)
+    }
+    
     //MARK: - Update and Save new records
     
     func updateRecord<T>(from: T, record: CKRecord, onUpdated: @escaping (CKRecord.ID) -> Void ) {

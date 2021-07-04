@@ -22,7 +22,7 @@ struct ContentView: View {
                 Text("Loading drawings...").font(.largeTitle)
             }
             DrawingPad(drawingVM: drawingVM)
-                .onAppear(perform: { drawingVM.loadDrawing {
+                .onAppear(perform: { drawingVM.loadDrawings {
                     print ("Drawing loaded...")
                     drawingsLoaded = true
                 } })

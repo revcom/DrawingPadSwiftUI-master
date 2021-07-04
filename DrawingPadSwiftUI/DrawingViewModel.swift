@@ -19,7 +19,7 @@ class DrawingViewModel : ObservableObject {
     @Published var color: Color = Color.yellow
     @Published var lineWidth: Double = 3.0
     
-    var currentDrawingIndex = 0
+    var currentDrawingIndex = -1
     var currentDrawing: Drawing {
         get { return drawings[currentDrawingIndex] }
     }
@@ -50,14 +50,21 @@ class DrawingViewModel : ObservableObject {
     
     let cloud = CloudDrawing()
 
-    func loadDrawing(onFound: @escaping () -> Void) {
-        drawings.append(Drawing(name: "Main"))
+    func loadDrawings(onFound: @escaping () -> Void) {
         
         cloud.findAllDrawings(onFound: { drawings in
-            DispatchQueue.main.async {
-                self.drawings.append(contentsOf: drawings)
-                self.currentDrawingIndex = 0
-                onFound()
+            DispatchQueue.main.async { [self] in
+                if drawings.count > 0 {
+                    self.drawings.append(contentsOf: drawings)
+                    currentDrawingIndex = 0
+                    cloud.findAllShapesFor(drawing: currentDrawing) { shapes in
+                    } onError: { error in
+                        print ("🔴 Error \(error.localizedDescription) loading shapes for drawing: \(currentDrawing.name)")
+                    }
+                    onFound()
+                } else {
+                    startNewDrawing()
+                }
             }
         } , onError: { error in
             print ("🔴 Error \(error.localizedDescription) loading drawings")
@@ -117,6 +124,16 @@ class CloudDrawing: CloudBase {
         record.setObject(drawing.name as __CKRecordObjCValue, forKey: "Name")
     }
     
+    func findAllShapesFor(drawing: Drawing, onFound: @escaping (([Shape]) -> Void), onError: @escaping (Error) -> Void ) {
+        fetchRecordsByReference(reference: drawing.reference!, referenceTo: drawing, onFetched: { (shapes: [Shape]) in
+            print ("Found \(shapes.count) shapes")
+        })
+    }
+    
+    func shapeToRecord(shape: Shape, record: CKRecord) {
+        
+    }
+    
     func shapeToRecord(shape: Shape, record: CKRecord , reference: CKRecord.Reference) {
         record["Drawing"] = reference
         
@@ -138,6 +155,7 @@ class CloudDrawing: CloudBase {
         let drawingName = record["Name"] as! String
         let newDrawing = Drawing(name: drawingName)
         newDrawing.originalRecord = record
+        newDrawing.reference = CKRecord.Reference(recordID: record.recordID, action: .none)
 
         print ("Found drawing named: \(newDrawing.name)")
         return newDrawing
