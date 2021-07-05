@@ -40,7 +40,7 @@ class DrawingViewModel : ObservableObject {
     func endOfShape(onSaved: @escaping (CKRecord.ID) -> Void) {
         currentDrawing.shapes.append(currentShape)
         print ("Appended shape with \(currentShape.points.count) points. Drawing \(currentDrawing.name) has \(currentDrawing.shapes.count) shapes")
-//        saveShape(drawing: currentDrawing, shape: currentShape) { id in onSaved(id) }
+        saveShape(drawing: currentDrawing, shape: currentShape) { id in onSaved(id) }
         currentShape = Shape(colour: color, width: lineWidth)
         for (index, shape) in currentDrawing.shapes.enumerated() {
             print ("Shape \(index) points \(shape.points.count)")
