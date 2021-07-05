@@ -29,6 +29,7 @@ class DrawingViewModel : ObservableObject {
     
     func deleteDrawingAndShapes() {
         cloudDrawing.deleteRecord(recordID: currentDrawing.recordID) {
+            self.startAndSaveNewDrawing()
             print ("Drawing and shapes deleted from iCloud")
         }
     }
@@ -88,7 +89,7 @@ class DrawingViewModel : ObservableObject {
                     }
                     onFound()
                 } else {
-                    startNewDrawing()
+                    startAndSaveNewDrawing()
                     print ("No drawings found - start new drawing")
                 }
             }
@@ -104,8 +105,6 @@ class DrawingViewModel : ObservableObject {
         cloudDrawing.saveRecord(from: currentDrawing, record: drawingRecord, onSaved: { [self] savedRecordID in
             currentDrawing.recordID = savedRecordID
             currentDrawing.originalRecord = drawingRecord
-            currentDrawing.reference = CKRecord.Reference(record: drawingRecord, action: .deleteSelf)
-
             saveShapesForDrawing(recordID: savedRecordID, shapes: self.currentDrawing.shapes, onShapesSaved: {
                 print ("Saved \(self.currentDrawing.shapes.count) shapes")
             })
@@ -115,7 +114,8 @@ class DrawingViewModel : ObservableObject {
     func saveShape(drawing: Drawing, shape: Shape, onSaved: @escaping (CKRecord.ID) -> Void ) {
         
         let shapeRecord = CKRecord(recordType: "Shape", recordID: CKRecord.ID(zoneID: .default))
-        guard let drawingReference = drawing.reference else { print ("🔴 Drawing has no reference yet"); return }
+        guard let originalRecord = drawing.originalRecord  else { print ("🔴 Drawing has not been saved yet"); return }
+        let drawingReference = CKRecord.Reference(record: originalRecord, action: .deleteSelf)
         cloudShape.shapeToRecord(shape: shape, record: shapeRecord, reference: drawingReference)
 
         cloudShape.saveRecord(from: shape, record: shapeRecord, onSaved: { savedRecordID in
@@ -156,7 +156,6 @@ class CloudDrawing: CloudBase {
         let newDrawing = Drawing(name: drawingName)
         newDrawing.recordID = record.recordID
         newDrawing.originalRecord = record
-        newDrawing.reference = CKRecord.Reference(recordID: record.recordID, action: .none)
 
         print ("Found drawing named: \(newDrawing.name)")
         return newDrawing
@@ -175,7 +174,9 @@ class CloudDrawing: CloudBase {
 class CloudShape: CloudBase {
     
     func findAllShapesFor(drawing: Drawing, onFound: @escaping (([Shape]) -> Void), onError: @escaping (Error) -> Void ) {
-        fetchRecordsByReference(reference: drawing.reference!, referenceTo: drawing, onFetched: { (shapes: [Shape]) in
+        guard let originalRecord = drawing.originalRecord  else { print ("🔴 Drawing has not been saved yet"); return }
+        let drawingReference = CKRecord.Reference(record: originalRecord, action: .deleteSelf)
+        fetchRecordsByReference(reference: drawingReference, referenceTo: drawing, onFetched: { (shapes: [Shape]) in
             print ("Found \(shapes.count) shapes")
             onFound(shapes)
         })

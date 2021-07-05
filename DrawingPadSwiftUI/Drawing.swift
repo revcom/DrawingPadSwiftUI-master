@@ -13,7 +13,6 @@ import CloudKit
 class Drawing {
     var recordID: CKRecord.ID = CKRecord.ID()
     var originalRecord: CKRecord? = nil
-    var reference: CKRecord.Reference? = nil
     var name: String = ""
     var shapes: [Shape] = []
     
@@ -22,11 +21,15 @@ class Drawing {
     }
 }
 
-struct Shape {  //MUST remain struct (not class) otherwise shapes won't appear until mouseUp whe drawing
+struct Shape: Hashable {  //MUST remain struct (not class) otherwise shapes won't appear until mouseUp whe drawing
     var originalRecord: CKRecord?
     var points: [CGPoint]
     var colour: Color
     var width: Double
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(colour)
+    }
     
     init(colour: Color, width: Double, points: [CGPoint] = []) {
         originalRecord = nil

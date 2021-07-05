@@ -14,15 +14,18 @@ struct DrawingPad: View {
     var body: some View {
         GeometryReader { geometry in
             if drawingVM.drawings.count > 0 {
-                Path { path in
-                   for shape in drawingVM.currentDrawing.shapes {
-                        //Previously drawn shapes
-                        self.addShape(shape, toPath: &path)
+                ZStack {
+                    ForEach(drawingVM.currentDrawing.shapes, id: \.self) { shape in
+                        //Draw existing shapes
+                        Path { path in
+                            self.addShape(shape, toPath: &path)
+                        }.stroke(shape.colour, lineWidth: CGFloat(shape.width))
                     }
-                    //Current shape being drawn
-                    self.addShape(drawingVM.currentShape, toPath: &path)
+                    //Draw shape curently being drawn
+                    Path { path in
+                        self.addShape(drawingVM.currentShape, toPath: &path)
+                    }.stroke(drawingVM.currentShape.colour, lineWidth: CGFloat(drawingVM.currentShape.width))
                 }
-                .stroke(drawingVM.currentShape.colour, lineWidth: CGFloat(drawingVM.currentShape.width))
                 .background(Color.black)
                 .gesture(DragGesture(minimumDistance: 0.1)
                     .onChanged({ (value) in
