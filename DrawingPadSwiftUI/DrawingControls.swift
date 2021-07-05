@@ -15,24 +15,17 @@ struct DrawingControls: View {
     
     @State var colour: Color = Color.red
 
-    private let spacing: CGFloat = 40
+    private let spacing: CGFloat = 30
     
     var body: some View {
         NavigationView {
             VStack {
                 HStack(spacing: spacing) {
-                    Button("Pick color") {
-                        self.colorPickerShown = true
-                    }
-                    Button("Undo") {
-                        if drawingVM.currentDrawing.shapes.count > 0 {
-                            drawingVM.removeLastShape()
-                        }
-                    }
-                    Button("Clear") {
-                        drawingVM.saveDrawing()
-//                        drawingVM.drawings = [Drawing]()
-                    }
+                    Button("Pick color") { self.colorPickerShown = true }
+                    Button("Undo") { if drawingVM.currentDrawing.shapes.count > 0 {drawingVM.removeLastShape()} }
+                    Button("Clear") { drawingVM.clearDrawing() }
+                    Button("Save") { drawingVM.saveCurrentDrawing() }
+                    Button("Purge") { drawingVM.deleteDrawingAndShapes() }
                 }
                 HStack {
                     Text("Pencil width")

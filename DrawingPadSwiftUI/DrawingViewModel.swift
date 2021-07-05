@@ -16,7 +16,7 @@ class DrawingViewModel : ObservableObject {
     @Published var currentShape: Shape = Shape(colour: Color.yellow, width: 2)
     @Published var drawings: [Drawing] = []
     @Published var color: Color = Color.yellow
-    @Published var lineWidth: Double = 3.0
+    @Published var lineWidth: Double = 2
     
     var currentDrawingIndex = -1
     var currentDrawing: Drawing {
@@ -27,9 +27,31 @@ class DrawingViewModel : ObservableObject {
 //        startNewDrawing()
     }
     
+    func deleteDrawingAndShapes() {
+        cloudDrawing.deleteRecord(recordID: currentDrawing.recordID) {
+            print ("Drawing and shapes deleted from iCloud")
+        }
+    }
+    
+    func clearDrawing() {
+        if drawings.count > 0 {
+            cloudDrawing.deleteDrawingAndShapes(drawing: currentDrawing) { [self] in
+                drawings = []
+                currentDrawingIndex = -1
+                startNewDrawing()
+                saveCurrentDrawing()
+            }
+        }
+    }
+    
     func removeLastShape() {
         let drawing = currentDrawing
         drawing.shapes.removeLast()
+    }
+    
+    func startAndSaveNewDrawing() {
+        startNewDrawing()
+        saveCurrentDrawing()
     }
 
     func startNewDrawing() {
@@ -67,6 +89,7 @@ class DrawingViewModel : ObservableObject {
                     onFound()
                 } else {
                     startNewDrawing()
+                    print ("No drawings found - start new drawing")
                 }
             }
         } , onError: { error in
@@ -74,15 +97,16 @@ class DrawingViewModel : ObservableObject {
         } )
     }
     
-    func saveDrawing() {
+    func saveCurrentDrawing() {
         let drawingRecord = CKRecord(recordType: "Drawing", recordID: CKRecord.ID(zoneID: .default))
-        
-        currentDrawing.reference = CKRecord.Reference(record: drawingRecord, action: .deleteSelf)
 
         cloudDrawing.drawingToRecord(drawing: currentDrawing, record: drawingRecord)
-        cloudDrawing.saveRecord(from: currentDrawing, record: drawingRecord, onSaved: { savedRecordID in
-            self.currentDrawing.originalRecord = drawingRecord
-            self.saveShapesForDrawing(recordID: drawingRecord.recordID, shapes: self.currentDrawing.shapes, onShapesSaved: {
+        cloudDrawing.saveRecord(from: currentDrawing, record: drawingRecord, onSaved: { [self] savedRecordID in
+            currentDrawing.recordID = savedRecordID
+            currentDrawing.originalRecord = drawingRecord
+            currentDrawing.reference = CKRecord.Reference(record: drawingRecord, action: .deleteSelf)
+
+            saveShapesForDrawing(recordID: savedRecordID, shapes: self.currentDrawing.shapes, onShapesSaved: {
                 print ("Saved \(self.currentDrawing.shapes.count) shapes")
             })
         })
@@ -130,11 +154,20 @@ class CloudDrawing: CloudBase {
     override func recordToResult(record: CKRecord) -> Any? {
         let drawingName = record["Name"] as! String
         let newDrawing = Drawing(name: drawingName)
+        newDrawing.recordID = record.recordID
         newDrawing.originalRecord = record
         newDrawing.reference = CKRecord.Reference(recordID: record.recordID, action: .none)
 
         print ("Found drawing named: \(newDrawing.name)")
         return newDrawing
+    }
+    
+    func deleteDrawingAndShapes(drawing: Drawing, onDeleted: @escaping () -> Void) {
+        guard let drawingRecord = drawing.originalRecord else { return }
+        deleteRecord(recordID: drawingRecord.recordID) {
+            print ("Drawing record and shapes successfully deleted")
+            onDeleted()
+        }
     }
     
 }

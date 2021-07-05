@@ -11,6 +11,7 @@ import SwiftUI
 import CloudKit
 
 class Drawing {
+    var recordID: CKRecord.ID = CKRecord.ID()
     var originalRecord: CKRecord? = nil
     var reference: CKRecord.Reference? = nil
     var name: String = ""
@@ -21,7 +22,7 @@ class Drawing {
     }
 }
 
-struct Shape {
+struct Shape {  //MUST remain struct (not class) otherwise shapes won't appear until mouseUp whe drawing
     var originalRecord: CKRecord?
     var points: [CGPoint]
     var colour: Color

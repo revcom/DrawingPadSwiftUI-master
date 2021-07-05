@@ -15,33 +15,33 @@ struct DrawingPad: View {
         GeometryReader { geometry in
             if drawingVM.drawings.count > 0 {
                 Path { path in
-                    for shape in drawingVM.currentDrawing.shapes {
-//                        print ("Color: \(shape.colour) Width: \(shape.width) Points: \(shape.points.count)")
-                        self.add(shape: shape, toPath: &path)
+                   for shape in drawingVM.currentDrawing.shapes {
+                        //Previously drawn shapes
+                        self.addShape(shape, toPath: &path)
                     }
-                    self.add(shape: drawingVM.currentShape, toPath: &path)
+                    //Current shape being drawn
+                    self.addShape(drawingVM.currentShape, toPath: &path)
                 }
-            .stroke(drawingVM.currentShape.colour, lineWidth: CGFloat(drawingVM.currentShape.width))
-            .background(Color.black)
-                    .gesture(
-                        DragGesture(minimumDistance: 0.1)
-                            .onChanged({ (value) in
-                                let currentPoint = value.location
-                                if currentPoint.y >= 0
-                                    && currentPoint.y < geometry.size.height {
-                                    drawingVM.currentShape.points.append(currentPoint)
-                                }
-                            })
-                            .onEnded({ (value) in
-                                drawingVM.endOfShape() { _ in print ("Ready for next stroke") }
-                            })
+                .stroke(drawingVM.currentShape.colour, lineWidth: CGFloat(drawingVM.currentShape.width))
+                .background(Color.black)
+                .gesture(DragGesture(minimumDistance: 0.1)
+                    .onChanged({ (value) in
+                        let currentPoint = value.location
+                        if currentPoint.y >= 0
+                            && currentPoint.y < geometry.size.height {
+                            drawingVM.currentShape.points.append(currentPoint)
+                        }
+                    })
+                    .onEnded({ (value) in
+                        drawingVM.endOfShape() { _ in print ("Ready for next stroke") }
+                    })
                 )
             }
         }
         .frame(maxHeight: .infinity)
     }
     
-    private func add(shape: Shape, toPath path: inout Path) {
+    private func addShape(_ shape: Shape, toPath path: inout Path) {
         let points = shape.points
         if points.count > 1 {
             for i in 0..<points.count-1 {
