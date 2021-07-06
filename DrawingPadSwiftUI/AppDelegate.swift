@@ -29,8 +29,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     //MARK: - Setup and Handle remote notifications from iCloud database
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        
-//        window.contentView = NSHostingView(rootView: contentView)
+
         UIApplication.shared.registerForRemoteNotifications()
         return true
     }
@@ -44,10 +43,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
+        print ("Remote notification received...")
         if let notification = CKNotification(fromRemoteNotificationDictionary: userInfo) {
-            updates.didUpdate = true
-            
-//            NotificationCenter.default.post(name: .cloudKitChanged, object: nil)
+            if notification.notificationType == .query {
+                let queryNotification = notification as! CKQueryNotification
+                print (" Record updated: \(queryNotification.recordID!)")
+                updates.didUpdate = true
+            }
             completionHandler(.newData)
             return
         }
