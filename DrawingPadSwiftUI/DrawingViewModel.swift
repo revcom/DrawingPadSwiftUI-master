@@ -113,6 +113,8 @@ class DrawingViewModel : ObservableObject {
     
     func saveShape(drawing: Drawing, shape: Shape, onSaved: @escaping (CKRecord.ID) -> Void ) {
         
+        cloudShape.initialiseSubscriptionsIfNecessary()
+
         let shapeRecord = CKRecord(recordType: "Shape", recordID: CKRecord.ID(zoneID: .default))
         guard let originalRecord = drawing.originalRecord  else { print ("🔴 Drawing has not been saved yet"); return }
         let drawingReference = CKRecord.Reference(record: originalRecord, action: .deleteSelf)
@@ -125,6 +127,9 @@ class DrawingViewModel : ObservableObject {
     }
     
     func saveShapesForDrawing(recordID: CKRecord.ID, shapes: [Shape], onShapesSaved: @escaping () -> Void) {
+        cloudShape.initialiseSubscriptionsIfNecessary()
+
+
         let drawingReference = CKRecord.Reference(recordID: recordID, action: .deleteSelf)
         var shapeRecords: [CKRecord] = []
         
@@ -172,6 +177,31 @@ class CloudDrawing: CloudBase {
 }
 
 class CloudShape: CloudBase {
+    
+    func initialiseSubscriptionsIfNecessary() {
+        iCloudDatabase.fetchAllSubscriptions { subscriptions, error in
+            if let error = error { print("🔴 Subscription error \(error.localizedDescription)"); return }
+            guard let subscriptions = subscriptions else { print ("🔴 Nil subscriptions"); return }
+            if subscriptions.count == 0 {
+                self.startSubscription()
+            }
+        }
+    }
+    
+    private func startSubscription() {
+        let newSubscription = CKQuerySubscription(recordType: "Shape", predicate: NSPredicate(value: true),
+          options: [.firesOnRecordCreation, .firesOnRecordDeletion, .firesOnRecordUpdate])
+
+        let notification = CKSubscription.NotificationInfo()
+        notification.shouldSendContentAvailable = true
+
+        newSubscription.notificationInfo = notification
+        
+        iCloudDatabase.save(newSubscription) { (subscription, error) in
+            if let error = error { print("🔴 Error starting subscription: \(error.localizedDescription)"); return }
+            if let _ = subscription { print("Hurrah! We have a subscription") }
+        }
+    }
     
     func findAllShapesFor(drawing: Drawing, onFound: @escaping (([Shape]) -> Void), onError: @escaping (Error) -> Void ) {
         guard let originalRecord = drawing.originalRecord  else { print ("🔴 Drawing has not been saved yet"); return }

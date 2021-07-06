@@ -16,12 +16,12 @@ struct DrawingPad: View {
             if drawingVM.drawings.count > 0 {
                 ZStack {
                     ForEach(drawingVM.currentDrawing.shapes, id: \.self) { shape in
-                        //Draw existing shapes
+                        //Draw previously constructed shapes
                         Path { path in
                             self.addShape(shape, toPath: &path)
                         }.stroke(shape.colour, lineWidth: CGFloat(shape.width))
                     }
-                    //Draw shape curently being drawn
+                    //Draw the new shape curently under construction with the pen/finger
                     Path { path in
                         self.addShape(drawingVM.currentShape, toPath: &path)
                     }.stroke(drawingVM.currentShape.colour, lineWidth: CGFloat(drawingVM.currentShape.width))
