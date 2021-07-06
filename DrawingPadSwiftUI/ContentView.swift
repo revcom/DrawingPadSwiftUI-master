@@ -12,9 +12,12 @@ let drawingVM = DrawingViewModel()
 
 struct ContentView: View {
     
+    @ObservedObject var updates: CloudUpdates
+
     @State var drawingsLoaded = false
 
     var body: some View {
+
         VStack(alignment: .center) {
             if drawingsLoaded {
                 Text(drawingVM.currentDrawing.name + " Drawing").font(.largeTitle)
@@ -26,13 +29,18 @@ struct ContentView: View {
                     print ("Drawing loaded...")
                     drawingsLoaded = true
                 } })
+
             DrawingControls(drawingVM: drawingVM)
         }
-        .onAppear() {
-//            if drawingVM.drawings.count == 0 {
-//                drawingVM.currentDrawing.shapes.append(drawingVM.currentShape)
-//                drawingVM.drawings.append(drawingVM.currentDrawing)
-//            }
-        }
+        .onReceive(updates.$didUpdate, perform: { _ in
+            drawingVM.loadDrawings {
+                print ("Drawing updated...")
+            }
+        })
+    }
+    
+    func refreshDrawingView() -> some View {
+        drawingVM.loadDrawings() {}
+        return EmptyView()
     }
 }

@@ -8,16 +8,29 @@
 
 import UIKit
 import CloudKit
+import SwiftUI
 
-@UIApplicationMain
+let updates = CloudUpdates()
+
+@main
+struct SwiftUIApp: App {
+
+    // inject into SwiftUI life-cycle via adaptor !!!
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+
+    var body: some Scene {
+        WindowGroup {
+            ContentView(updates: updates)
+        }
+    }
+}
+
 class AppDelegate: UIResponder, UIApplicationDelegate {
     
-    let store = Store()
-
     //MARK: - Setup and Handle remote notifications from iCloud database
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         
-        window.contentView = NSHostingView(rootView: contentView.environmentObject(store))
+//        window.contentView = NSHostingView(rootView: contentView)
         UIApplication.shared.registerForRemoteNotifications()
         return true
     }
@@ -32,7 +45,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
         if let notification = CKNotification(fromRemoteNotificationDictionary: userInfo) {
-            print("✅ CloudKit database changed")
+            updates.didUpdate = true
             
 //            NotificationCenter.default.post(name: .cloudKitChanged, object: nil)
             completionHandler(.newData)
@@ -57,7 +70,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 }
 
-class Store: ObservableObject {
-    
+class CloudUpdates: ObservableObject {
+    @Published var didUpdate = false
+    var recordsToUpdate: [CKRecord.ID] = []
 }
 
