@@ -47,8 +47,20 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         if let notification = CKNotification(fromRemoteNotificationDictionary: userInfo) {
             if notification.notificationType == .query {
                 let queryNotification = notification as! CKQueryNotification
-                print (" Record updated: \(queryNotification.recordID!)")
-                updates.didUpdate = true
+                guard let recordID = queryNotification.recordID  else { print ("🔴 Bad recordID in notfication"); return }
+
+                switch queryNotification.queryNotificationReason {
+                    case .recordCreated:
+                        print ("Record created: \(recordID)")
+                        updates.recordsToUpdate.append(recordID)
+                        updates.didUpdate = true
+                    case .recordUpdated:
+                        print ("Record updated: \(recordID)")
+                    case .recordDeleted:
+                        print ("Record deleted: \(recordID)")
+                    @unknown default:
+                        print ("Unknown iCloud notification type")
+                }
             }
             completionHandler(.newData)
             return
@@ -75,5 +87,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 class CloudUpdates: ObservableObject {
     @Published var didUpdate = false
     var recordsToUpdate: [CKRecord.ID] = []
+    
+    init() {
+        print ("CloudUpdates created")
+    }
 }
 

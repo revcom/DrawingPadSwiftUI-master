@@ -18,6 +18,7 @@ class DrawingViewModel : ObservableObject {
     @Published var color: Color = Color.yellow
     @Published var lineWidth: Double = 2
     
+    var loadingInProgress = false
     var currentDrawingIndex = -1
     var currentDrawing: Drawing {
         get { return drawings[currentDrawingIndex] }
@@ -74,7 +75,7 @@ class DrawingViewModel : ObservableObject {
     let cloudShape = CloudShape()
 
     func loadDrawings(onFound: @escaping () -> Void) {
-        
+        loadingInProgress = true
         cloudDrawing.findAllDrawings(onFound: { drawings in
             DispatchQueue.main.async { [self] in
                 if drawings.count > 0 {
@@ -82,7 +83,7 @@ class DrawingViewModel : ObservableObject {
                     currentDrawingIndex = 0
                     cloudShape.findAllShapesFor(drawing: currentDrawing) { shapes in
                         currentDrawing.shapes.append(contentsOf: shapes)
-                        print ("Drawings now...\(drawings.count)")
+                        print ("Drawings now...\(drawings.count) with \(currentDrawing.shapes.count) shapes")
                         objectWillChange.send()
                     } onError: { error in
                         print ("🔴 Error \(error.localizedDescription) loading shapes for drawing: \(currentDrawing.name)")
@@ -92,10 +93,19 @@ class DrawingViewModel : ObservableObject {
                     startAndSaveNewDrawing()
                     print ("No drawings found - start new drawing")
                 }
+                loadingInProgress = false
             }
         } , onError: { error in
             print ("🔴 Error \(error.localizedDescription) loading drawings")
         } )
+    }
+    
+    func loadShape(recordID: CKRecord.ID) {
+        cloudShape.fetchShapeBy(id: recordID) { shape in
+            self.currentDrawing.shapes.append(shape)
+            updates.recordsToUpdate.removeAll { $0 == recordID}
+            print ("Shape added: \(self.currentDrawing.shapes.count) in total")
+        }
     }
     
     func saveCurrentDrawing() {
@@ -200,6 +210,12 @@ class CloudShape: CloudBase {
         iCloudDatabase.save(newSubscription) { (subscription, error) in
             if let error = error { print("🔴 Error starting subscription: \(error.localizedDescription)"); return }
             if let _ = subscription { print("Hurrah! We have a subscription") }
+        }
+    }
+    
+    func fetchShapeBy(id: CKRecord.ID, onFound: @escaping ((Shape) -> Void )) {
+        fetchRecordByID(recordID: id) { shape in
+            onFound(shape)
         }
     }
     

@@ -19,28 +19,28 @@ struct ContentView: View {
     var body: some View {
 
         VStack(alignment: .center) {
-            if drawingsLoaded {
+            if drawingsLoaded && drawingVM.drawings.count > 0 {
                 Text(drawingVM.currentDrawing.name + " Drawing").font(.largeTitle)
             } else {
                 Text("Loading drawings...").font(.largeTitle)
             }
             DrawingPad(drawingVM: drawingVM)
-                .onAppear(perform: { drawingVM.loadDrawings {
-                    print ("Drawing loaded...")
-                    drawingsLoaded = true
-                } })
+                .onAppear(perform: {
+                    if !drawingVM.loadingInProgress {
+                        drawingVM.loadDrawings {
+                            print ("Drawing loaded...")
+                        }
+                        drawingsLoaded = true
+                    }
+                })
 
             DrawingControls(drawingVM: drawingVM)
         }
         .onReceive(updates.$didUpdate, perform: { _ in
-            drawingVM.loadDrawings {
-                print ("Drawing updated...")
+            if updates.didUpdate {
+                print ("onReceive")
+                drawingVM.loadShape(recordID: updates.recordsToUpdate[0])
             }
         })
-    }
-    
-    func refreshDrawingView() -> some View {
-        drawingVM.loadDrawings() {}
-        return EmptyView()
     }
 }
