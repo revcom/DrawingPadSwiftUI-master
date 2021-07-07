@@ -42,31 +42,30 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         print ("🔴 Failed to register for remote notifications: \(error.localizedDescription)")
     }
     
-    func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
-        print ("Remote notification received...")
-        if let notification = CKNotification(fromRemoteNotificationDictionary: userInfo) {
-            if notification.notificationType == .query {
-                let queryNotification = notification as! CKQueryNotification
-                guard let recordID = queryNotification.recordID  else { print ("🔴 Bad recordID in notfication"); return }
-
-                switch queryNotification.queryNotificationReason {
-                    case .recordCreated:
-                        print ("Record created: \(recordID)")
-                        updates.recordsToUpdate.append(recordID)
-                        updates.didUpdate = true
-                    case .recordUpdated:
-                        print ("Record updated: \(recordID)")
-                    case .recordDeleted:
-                        print ("Record deleted: \(recordID)")
-                    @unknown default:
-                        print ("Unknown iCloud notification type")
-                }
-            }
-            completionHandler(.newData)
-            return
-        }
-
-    }
+//    func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
+//        print ("Remote notification received...")
+//        if let notification = CKNotification(fromRemoteNotificationDictionary: userInfo) {
+//            if notification.notificationType == .query {
+//                let queryNotification = notification as! CKQueryNotification
+//                guard let recordID = queryNotification.recordID  else { print ("🔴 Bad recordID in notfication"); return }
+//
+//                switch queryNotification.queryNotificationReason {
+//                    case .recordCreated:
+//                        print ("Record created: \(recordID)")
+//                        updates.recordsToUpdate.append(recordID)
+//                        updates.didUpdate = true
+//                    case .recordUpdated:
+//                        print ("Record updated: \(recordID)")
+//                    case .recordDeleted:
+//                        print ("Record deleted: \(recordID)")
+//                    @unknown default:
+//                        print ("Unknown iCloud notification type")
+//                }
+//            }
+//            completionHandler(.newData)
+//            return
+//        }
+//    }
 
 
     // MARK: UISceneSession Lifecycle
@@ -90,6 +89,24 @@ class CloudUpdates: ObservableObject {
     
     init() {
         print ("CloudUpdates created")
+    }
+}
+
+extension UIApplication {
+    static let didReceiveRemoteNotification = Notification.Name("didReceiveRemoteNotification")
+}
+
+extension AppDelegate {
+    
+    func application(_ application: UIApplication,
+                     didReceiveRemoteNotification userInfo: [AnyHashable : Any],
+                     fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
+        
+        NotificationCenter.default.post(name: UIApplication.didReceiveRemoteNotification,
+                                        object: nil)
+        
+        completionHandler(.newData)
+        return
     }
 }
 

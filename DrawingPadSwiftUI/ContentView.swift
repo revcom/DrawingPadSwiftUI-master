@@ -7,6 +7,8 @@
 //
 
 import SwiftUI
+import Combine
+import CloudKit
 
 let drawingVM = DrawingViewModel()
 
@@ -15,6 +17,18 @@ struct ContentView: View {
     @ObservedObject var updates: CloudUpdates
 
     @State var drawingsLoaded = false
+    
+    private var remoteBotificationPublisher: AnyPublisher<CGFloat, Never> {
+            Publishers.Merge(
+                NotificationCenter.default
+                    .publisher(for: UIApplication.didReceiveRemoteNotification)
+                    .compactMap { $0.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect }
+                    .map { $0.height },
+                NotificationCenter.default
+                    .publisher(for: UIResponder.keyboardWillHideNotification)
+                    .map { _ in CGFloat(0) }
+            ).eraseToAnyPublisher()
+        }
 
     var body: some View {
 
@@ -29,8 +43,8 @@ struct ContentView: View {
                     if !drawingVM.loadingInProgress {
                         drawingVM.loadDrawings {
                             print ("Drawing loaded...")
+                            drawingsLoaded = true
                         }
-                        drawingsLoaded = true
                     }
                 })
 
