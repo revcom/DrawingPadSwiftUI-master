@@ -18,17 +18,12 @@ struct ContentView: View {
 
     @State var drawingsLoaded = false
     
-    private var remoteBotificationPublisher: AnyPublisher<CGFloat, Never> {
-            Publishers.Merge(
-                NotificationCenter.default
-                    .publisher(for: UIApplication.didReceiveRemoteNotification)
-                    .compactMap { $0.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect }
-                    .map { $0.height },
-                NotificationCenter.default
-                    .publisher(for: UIResponder.keyboardWillHideNotification)
-                    .map { _ in CGFloat(0) }
-            ).eraseToAnyPublisher()
-        }
+    private var remoteNotificationPublisher: AnyPublisher<CKRecord.ID, Never> {
+        NotificationCenter.default.publisher(for: UIApplication.didReceiveRemoteNotification)
+        .compactMap { CKNotification(fromRemoteNotificationDictionary: $0.userInfo!) }
+        .compactMap { $0 as! CKQueryNotification? }
+        .map { $0.recordID! }.eraseToAnyPublisher()
+    }
 
     var body: some View {
 
@@ -50,11 +45,11 @@ struct ContentView: View {
 
             DrawingControls(drawingVM: drawingVM)
         }
-        .onReceive(updates.$didUpdate, perform: { _ in
-            if updates.didUpdate {
-                print ("onReceive")
-                drawingVM.loadShape(recordID: updates.recordsToUpdate[0])
-            }
-        })
+        .onReceive(remoteNotificationPublisher) { _ in print ("Received notification AT LAST") }
+//            if updates.didUpdate {
+//                print ("onReceive")
+//                drawingVM.loadShape(recordID: updates.recordsToUpdate[0])
+//            }
+//        })
     }
 }

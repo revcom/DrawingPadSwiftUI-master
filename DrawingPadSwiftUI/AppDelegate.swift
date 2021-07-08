@@ -103,8 +103,7 @@ extension AppDelegate {
                      fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
         
         NotificationCenter.default.post(name: UIApplication.didReceiveRemoteNotification,
-                                        object: nil)
-        
+                                        object: userInfo)
         completionHandler(.newData)
         return
     }
