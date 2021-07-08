@@ -101,10 +101,10 @@ extension AppDelegate {
     func application(_ application: UIApplication,
                      didReceiveRemoteNotification userInfo: [AnyHashable : Any],
                      fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
-        
+        print ("didReceiveRemoteNotification")
         NotificationCenter.default.post(name: UIApplication.didReceiveRemoteNotification,
-                                        object: userInfo)
-        completionHandler(.newData)
+                                        object: nil, userInfo: userInfo)
+        completionHandler(.noData)
         return
     }
 }

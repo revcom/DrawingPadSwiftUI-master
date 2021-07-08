@@ -18,12 +18,11 @@ struct ContentView: View {
 
     @State var drawingsLoaded = false
     
-    private var remoteNotificationPublisher: AnyPublisher<CKRecord.ID, Never> {
+    @State private var remoteNotificationPublisher =
         NotificationCenter.default.publisher(for: UIApplication.didReceiveRemoteNotification)
         .compactMap { CKNotification(fromRemoteNotificationDictionary: $0.userInfo!) }
         .compactMap { $0 as! CKQueryNotification? }
         .map { $0.recordID! }.eraseToAnyPublisher()
-    }
 
     var body: some View {
 
@@ -45,7 +44,7 @@ struct ContentView: View {
 
             DrawingControls(drawingVM: drawingVM)
         }
-        .onReceive(remoteNotificationPublisher) { _ in print ("Received notification AT LAST") }
+        .onReceive(remoteNotificationPublisher) { id in print ("onReceive(d) notification...") }
 //            if updates.didUpdate {
 //                print ("onReceive")
 //                drawingVM.loadShape(recordID: updates.recordsToUpdate[0])

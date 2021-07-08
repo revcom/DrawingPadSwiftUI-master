@@ -10,6 +10,7 @@ import Foundation
 import SwiftUI
 import UIKit
 import CloudKit
+import Combine
 
 class DrawingViewModel : ObservableObject {
     
@@ -17,6 +18,13 @@ class DrawingViewModel : ObservableObject {
     @Published var drawings: [Drawing] = []
     @Published var color: Color = Color.yellow
     @Published var lineWidth: Double = 2
+    
+    var remoteNotificationPublisher: AnyPublisher<CKRecord.ID, Never> {
+        NotificationCenter.default.publisher(for: UIApplication.didReceiveRemoteNotification)
+            .compactMap { CKNotification(fromRemoteNotificationDictionary: $0.userInfo!) }
+            .compactMap { $0 as! CKQueryNotification? }
+            .map { $0.recordID! }.eraseToAnyPublisher()
+    }
     
     var loadingInProgress = false
     var currentDrawingIndex = -1
