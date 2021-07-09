@@ -212,6 +212,7 @@ class CloudShape: CloudBase {
 
         let notification = CKSubscription.NotificationInfo()
         notification.shouldSendContentAvailable = true
+        notification.alertBody = ""
 
         newSubscription.notificationInfo = notification
         

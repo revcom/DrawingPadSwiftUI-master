@@ -13,7 +13,7 @@ class CloudBase {
     enum Status { case timeoutError, otherError, completed }
     
     let iCloudDatabase = CKContainer(identifier: "iCloud.com.revcomputing.SharedDrawing").privateCloudDatabase
-//    static let ourZone = "WhereWhenHowMuch"
+//    static let ourZone = "SharedDrawing"
     
     //MARK: - Find records
     func findAllRecords<T>(onFound: @escaping ([T]) -> Void, iCloudRecordType: String = String(describing: T.self), onError: @escaping (Error) -> Void) {

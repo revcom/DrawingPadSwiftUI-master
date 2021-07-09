@@ -22,10 +22,11 @@ struct ContentView: View {
         NotificationCenter.default.publisher(for: UIApplication.didReceiveRemoteNotification)
         .compactMap { CKNotification(fromRemoteNotificationDictionary: $0.userInfo!) }
         .compactMap { $0 as! CKQueryNotification? }
-        .map { $0.recordID! }.eraseToAnyPublisher()
+        .map { $0.recordID! }
+        .eraseToAnyPublisher()
 
     var body: some View {
-
+//        Print ("Refreshing View...")
         VStack(alignment: .center) {
             if drawingsLoaded && drawingVM.drawings.count > 0 {
                 Text(drawingVM.currentDrawing.name + " Drawing").font(.largeTitle)
@@ -34,6 +35,7 @@ struct ContentView: View {
             }
             DrawingPad(drawingVM: drawingVM)
                 .onAppear(perform: {
+                    print ("onAppear...")
                     if !drawingVM.loadingInProgress {
                         drawingVM.loadDrawings {
                             print ("Drawing loaded...")
@@ -44,11 +46,9 @@ struct ContentView: View {
 
             DrawingControls(drawingVM: drawingVM)
         }
-        .onReceive(remoteNotificationPublisher) { id in print ("onReceive(d) notification...") }
-//            if updates.didUpdate {
-//                print ("onReceive")
-//                drawingVM.loadShape(recordID: updates.recordsToUpdate[0])
-//            }
-//        })
+        .onReceive(remoteNotificationPublisher) { id in
+            print ("onReceive(d) notification...")
+            drawingVM.loadShape(recordID: id)
+        }
     }
 }
